@@ -97,6 +97,7 @@ public class RomanNumber
 
         if (invalidDigits.Count > 0)
         {
+            invalidDigits.Reverse();
             throw new ArgumentException($"'{input}' Parse error: Invalid digits '{String.Join("'", invalidDigits)}'");
         }
 
