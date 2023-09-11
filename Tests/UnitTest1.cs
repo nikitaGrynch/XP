@@ -179,7 +179,15 @@ public class RomanNumberTest
             { 999, "CMXCIX" },
             {-45, "-XLV"},
             {-95, "-XCV"},
-            {-285, "-CCLXXXV"}
+            {-285, "-CCLXXXV"},
+            {500, "D"},
+            {2000, "MM"},
+            {50, "L"},
+            {1050, "ML"},
+            {1115, "MCXV"},
+            {1400, "MCD"},
+            {1935, "MCMXXXV"},
+            {2023, "MMXXIII"}
         };
         foreach (var testCase in testCases)
         {
