@@ -151,13 +151,22 @@ public class RomanNumberTest
             );
         }
 
-        String[] dubious2 = { "IIX", "VVX" };
+        // HW 11_09_23
+        String[] dubious2 =
+            { "IIX", "VVX", "IVX", "VIX", "IIIX", "VVIX", "CCM", "VVC", "XXD", "DDM", "CCMMC", "LLM", "XVC", "IIM" };
         foreach (var str in dubious2)
         {
+            /*
             Assert.IsNotNull(
                 RomanNumber.Parse(str),
                 $"Dubious '{str}' cause NULL"
                 );
+            */
+            Assert.ThrowsException<ArgumentException>(() =>
+                    RomanNumber.Parse(str),
+                $"Dubious '{str}' cause Exception"
+                );
+
         }
 
 
@@ -213,5 +222,141 @@ public class RomanNumberTest
                 $"Parse('{r}'.ToString()) --> '{rnd}'");
         }
     }
+
+    [TestMethod]
+    public void TypesFeature()
+    {
+        RomanNumber r = new(10);
+        Assert.AreEqual(10L, r.Value); // 10u - uint, r.Value - int -- fail
+        
+        Assert.AreEqual((short)10, r.Value);
+    }
+
+    [TestMethod]
+    public void TestPlus()
+    {
+        RomanNumber r1 = new(10);
+        RomanNumber r2 = new(20);
+        var r3 = r1.Plus(r2);
+        Assert.IsInstanceOfType(r1.Plus(r2), typeof(RomanNumber));
+        Assert.AreNotSame(r1, r3);
+        Assert.AreNotSame(r2, r3);
+
+        Assert.AreEqual(30, r3.Value);
+        Assert.AreEqual("XXX", r3.ToString());
+
+        Assert.AreEqual(15, r1.Plus(new(5)).Value);
+        Assert.AreEqual(1, r1.Plus(new(-9)).Value);
+        Assert.AreEqual(-1, r1.Plus(new(-11)).Value);
+        Assert.AreEqual(0, r1.Plus(new(-10)).Value);
+        Assert.AreEqual(10, r1.Plus(new()).Value);
+        
+        Assert.AreEqual(5, RomanNumber.Parse("IV").Plus(new(1)).Value);
+        Assert.AreEqual(-6, RomanNumber.Parse("-V").Plus(new(-1)).Value);
+        
+        Assert.AreEqual("N", new RomanNumber(20).Plus(new(-20)).ToString());
+        Assert.AreEqual("-II", new RomanNumber(-20).Plus(new(18)).ToString());
+
+        var ex = Assert.ThrowsException<ArgumentNullException>(() => r1.Plus(null!),
+            "Plus(null!) -> ArgumentNullException"
+        );
+
+        String expectedFragment = "Illegal Plus() invocation with wull argument";
+        Assert.IsTrue(ex.Message.Contains(expectedFragment,
+                StringComparison.InvariantCultureIgnoreCase
+            ),
+            $"Plus(null!): ex.Message ({ex.Message}) contains '{expectedFragment}'"
+        );
+
+    }
     
+    [TestMethod]
+    public void TestMinus()
+    {
+        RomanNumber r1 = new(10);
+        RomanNumber r2 = new(20);
+        var r3 = r1.Minus(r2);
+        Assert.IsInstanceOfType(r1.Minus(r2), typeof(RomanNumber));
+        Assert.AreNotSame(r1, r3);
+        Assert.AreNotSame(r2, r3);
+        
+        Assert.AreEqual(-10, r3.Value);
+        Assert.AreEqual("-X", r3.ToString());
+
+        Assert.AreEqual(5, r1.Minus(new(5)).Value);
+        Assert.AreEqual(19, r1.Minus(new(-9)).Value);
+        Assert.AreEqual(21, r1.Minus(new(-11)).Value);
+        Assert.AreEqual(20, r1.Minus(new(-10)).Value);
+        Assert.AreEqual(10, r1.Minus(new()).Value);
+        Assert.AreEqual(0, r1.Minus(new(10)).Value);
+        
+        Assert.AreEqual(3, RomanNumber.Parse("IV").Minus(new(1)).Value);
+        Assert.AreEqual(-4, RomanNumber.Parse("-V").Minus(new(-1)).Value);
+        
+        Assert.AreEqual("XL", new RomanNumber(20).Minus(new(-20)).ToString());
+        Assert.AreEqual("-XXXVIII", new RomanNumber(-20).Minus(new(18)).ToString());
+        Assert.AreEqual("N", new RomanNumber(20).Minus(new(20)).ToString());
+
+        var ex = Assert.ThrowsException<ArgumentNullException>(() => r1.Minus(null!),
+            "Minus(null!) -> ArgumentNullException"
+        );
+
+        String expectedFragment = "Illegal Minus() invocation with wull argument";
+        Assert.IsTrue(ex.Message.Contains(expectedFragment,
+                StringComparison.InvariantCultureIgnoreCase
+            ),
+            $"Minus(null!): ex.Message ({ex.Message}) contains '{expectedFragment}'"
+        );
+
+    }
+
+    [TestMethod]
+    public void TestSum()
+    {
+        RomanNumber r1 = new(10);
+        RomanNumber r2 = new(20);
+
+        var r3 = RomanNumber.Sum(r1, r2);
+        Assert.IsInstanceOfType(r3, typeof(RomanNumber));
+        
+        Assert.AreEqual(60 ,RomanNumber.Sum(r1, r2, r3).Value);
+        
+        Assert.AreEqual(0, RomanNumber.Sum().Value);
+
+        Assert.IsNull(RomanNumber.Sum(null!));
+        
+        Assert.AreEqual(40, RomanNumber.Sum(r1, null!, r3).Value);
+
+        var arr1 = Array.Empty<RomanNumber>();
+        var arr2 = new RomanNumber[] { new(2), new(4), new(5) };
+        Assert.AreEqual(0, RomanNumber.Sum(arr1).Value, "Empty arr --> Sum 0");
+        Assert.AreEqual(11, RomanNumber.Sum(arr2).Value, "2-4-5 arr --> Sum 11");
+
+        IEnumerable<RomanNumber> arr3 = new List<RomanNumber>() { new(2), new(4), new(5)};
+        Assert.AreEqual(11, RomanNumber.Sum(arr3.ToArray()).Value, "2-4-5 list --> Sum 11");
+
+
+        Random rnd = new();
+        for (int i = 0; i < 200; i++)
+        {
+            int x = rnd.Next(-3000, 3000);
+            int y = rnd.Next(-3000, 3000);
+            Assert.AreEqual(
+                x+y,
+                RomanNumber.Sum(new(x), new(y)).Value,
+                $"{x} + {y} - rnd test"
+                );
+        }
+        
+        for (int i = 0; i < 200; i++)
+        {
+            RomanNumber rx = new(rnd.Next(-3000, 3000));
+            RomanNumber ry = new(rnd.Next(-3000, 3000));
+            Assert.AreEqual(
+                rx.Plus(ry).Value,
+                RomanNumber.Sum(rx, ry).Value,
+                $"{rx} + {ry} - rnd test"
+            );
+        }
+    }
 }
