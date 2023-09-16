@@ -1,5 +1,6 @@
 using System.Text;
 using System.Text.RegularExpressions;
+using Microsoft.VisualBasic;
 
 namespace App;
 
@@ -17,6 +18,9 @@ public class RomanNumber
     private const String MINUS_NULL_ARGUMENT_MESSAGE = "Illegal Minus() invocation with wull argument";
 
     private static String DigitDecorator(char c) => $"'{c}'";
+    
+    // HW 13_09_23
+    private static String InvalidDigitsFormatMessage(List<char> invalidChars) => String.Join(",", invalidChars.Select(DigitDecorator));
 
     public int Value { get; set; }
 
@@ -109,7 +113,9 @@ public class RomanNumber
 
                 String.Format(INVALID_DIGITS_FORMAT,
                     input,
-                    String.Join(", ",invalidChars.Select(DigitDecorator))));
+                    //String.Join(", ",invalidChars.Select(DigitDecorator))
+                    InvalidDigitsFormatMessage(invalidChars)
+                ));
         }
 
         #endregion
