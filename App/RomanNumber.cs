@@ -194,10 +194,29 @@ public class RomanNumber
 
     public static RomanNumber Sum(params RomanNumber[] numbers)
     {
-        if (numbers == null)
+        if (numbers == null!)
         {
             return null!;
         }
+
+        // HW 14_09_23
+        if (numbers.Length > 0)
+        {
+            int nullableNumbersCount = 0;
+            foreach (var number in numbers)
+            {
+                if (number == null!)
+                {
+                    nullableNumbersCount++;
+                }
+            }
+
+            if (nullableNumbersCount == numbers.Length)
+            {
+                return null!;
+            }
+        }
+
         return new(numbers.Sum(number => number?.Value ?? 0)); 
         //return numbers.Aggregate((r1, r2) => r1.Plus(r2));
     }

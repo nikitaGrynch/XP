@@ -335,6 +335,10 @@ public class RomanNumberTest
         IEnumerable<RomanNumber> arr3 = new List<RomanNumber>() { new(2), new(4), new(5)};
         Assert.AreEqual(11, RomanNumber.Sum(arr3.ToArray()).Value, "2-4-5 list --> Sum 11");
 
+        // HW 14_09_23
+        var arr4 = new RomanNumber[] { null!, null!, null! };
+        Assert.AreEqual(null, RomanNumber.Sum(arr4), "null!-null!-null! --> null!");
+
 
         Random rnd = new();
         for (int i = 0; i < 200; i++)
