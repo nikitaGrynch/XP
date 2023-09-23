@@ -363,4 +363,41 @@ public class RomanNumberTest
             );
         }
     }
+
+    [TestMethod]
+    public void TestEval()
+    {
+        Assert.IsNotNull(RomanNumber.Eval("V + I"));
+        Assert.IsInstanceOfType(RomanNumber.Eval("X + V"), typeof(RomanNumber));
+        Assert.AreEqual(10, RomanNumber.Eval("V + V").Value);
+        Assert.AreEqual(17, RomanNumber.Eval("XX - III").Value);
+        Assert.AreEqual(-23, RomanNumber.Eval("-XX - III").Value);
+        Assert.AreEqual(-20, RomanNumber.Eval("-XX - N").Value);
+        Assert.AreEqual(5, RomanNumber.Eval("V").Value);
+        Assert.AreEqual(0, RomanNumber.Eval("N").Value);
+
+        Random rnd = new();
+        for (int i = 0; i < 200; i++)
+        {
+            int n1 = rnd.Next(-3000, 3000);
+            int n2 = rnd.Next(-3000, 3000);
+            RomanNumber r1 = new(n1);
+            RomanNumber r2 = new(n2);
+            Assert.AreEqual(r1.Plus(r2).Value, RomanNumber.Eval($"{r1.ToString()} + {r2.ToString()}").Value);
+            Assert.AreEqual(r1.Minus(r2).Value, RomanNumber.Eval($"{r1.ToString()} - {r2.ToString()}").Value);
+        }
+        
+        // "-V-X"
+        //     *  "-V - -X"
+        //     *  "-V--X"
+        //     *  "-V+-X"
+        //     *  "V + -X"
+
+        Assert.ThrowsException<ArgumentException>(() => RomanNumber.Eval("+V + X"));
+        Assert.ThrowsException<ArgumentException>(() => RomanNumber.Eval("V + +X"));
+        Assert.ThrowsException<ArgumentException>(() => RomanNumber.Eval("+V+X"));
+        Assert.ThrowsException<ArgumentException>(() => RomanNumber.Eval("-V + - X"));
+        Assert.ThrowsException<ArgumentException>(() => RomanNumber.Eval("-V - - X"));
+        
+    }
 }

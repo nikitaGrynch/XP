@@ -8,6 +8,7 @@ public class RomanNumber
 {
     private const char ZERO_DIGIT = 'N';
     private const String MINUS_SIGN = "-";
+    private const String PLUS_SIGN = "+";
     private const String INVALID_DIGIT_MESSAGE = "Invalid digit";
     private const String EMPTY_INPUT_MESSAGE = "Empty or NULL input";
     private const String INVALID_STRUCTURE_MESSAGE = "Invalid roman number structure";
@@ -16,6 +17,7 @@ public class RomanNumber
     private Func<char, String> DIGIT_DECORATOR = c => $"'{c}'";
     private const String PLUS_NULL_ARGUMENT_MESSAGE = "Illegal Plus() invocation with wull argument";
     private const String MINUS_NULL_ARGUMENT_MESSAGE = "Illegal Minus() invocation with wull argument";
+    private const String EVAL_NULL_ARGUMENT_MESSAGE = "Illegal Eval() invocation with wull argument";
 
     private static String DigitDecorator(char c) => $"'{c}'";
     
@@ -220,4 +222,53 @@ public class RomanNumber
         return new(numbers.Sum(number => number?.Value ?? 0)); 
         //return numbers.Aggregate((r1, r2) => r1.Plus(r2));
     }
+
+    public static RomanNumber Eval(String input)
+    {
+        if (input is null)
+        {
+            throw new ArgumentException(EVAL_NULL_ARGUMENT_MESSAGE);
+        }
+
+        var operationSymbol = "";
+        var r1Str = "";
+        var r2Str = "";
+        if (input.Contains(Char.Parse(PLUS_SIGN)))
+        {
+            operationSymbol = PLUS_SIGN;
+            r1Str = input.Split(operationSymbol)[0].Trim();
+            r2Str = input.Split(operationSymbol)[1].Trim();
+        }
+        else if (input.Contains(Char.Parse(MINUS_SIGN)))
+        {
+            operationSymbol = MINUS_SIGN;
+            r1Str = input.Substring(0, input.IndexOf(operationSymbol, 1)).Trim();
+            r2Str = input.Substring(input.IndexOf(MINUS_SIGN, 1) + 1).Trim();
+        }
+        else
+        {
+            return RomanNumber.Parse(input);
+        }
+
+        try
+        {
+            var r1 = RomanNumber.Parse(r1Str);
+            var r2 = RomanNumber.Parse(r2Str);
+            if (operationSymbol == PLUS_SIGN)
+            {
+                return r1.Plus(r2);
+            }
+            else 
+            {
+                return r1.Minus(r2);
+            }
+        }
+        catch (Exception ex)
+        {
+            throw new ArgumentException(ex.Message);
+        }
+
+    }
+
+    
 }
